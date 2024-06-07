@@ -1,0 +1,5 @@
+{
+  "team_name": "nlpsuricates",
+  "task_type": "causal_lm",
+  "policy_reward_accuracy": 0.5
+}
