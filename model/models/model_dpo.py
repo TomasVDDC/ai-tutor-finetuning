@@ -399,10 +399,39 @@ class AutoDPOModelForCausalLM(PreTrainedModelWrapper):
         # ======================================================================
         # You need to return one letter prediction for each question.
         # ======================================================================
-        raise NotImplementedError
+     
         ########################################################################
+        
+        def convert_to_letter(prediction_class):
+            if prediction_class == 0:
+                return "A"
+            elif prediction_class == 1:
+                return "B"
+            elif prediction_class == 2:
+                return "C"
+            elif prediction_class == 3:
+                return "D"
+        def convert_to_class(prediction_letter):
+            if prediction_letter == "A":
+                return 0
+            elif prediction_letter == "B":
+                return 1
+            elif prediction_letter == "C":
+                return 2
+            elif prediction_letter == "D":
+                return 3
+            
+        inputs = tokenizer(batch["question"], return_tensors="pt", padding=True, truncation=True)
+        with torch.no_grad():
+            labels = list(map(convert_to_class, batch["answer"]))   # A->0
+            outputs = self.pretrained_model(**inputs,labels=labels)
+            logits = outputs.logits
+            prediction_classes = logits.argmax(dim=-1)
+            prediction_letters = list(map(convert_to_letter, prediction_classes)) # 0->A
+            output_dict["preds"].extend(prediction_letters)
 
         return output_dict
+
 
 
 class AutoDPOModelForSeq2SeqLM(PreTrainedModelWrapper):
