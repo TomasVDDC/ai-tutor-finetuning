@@ -1,0 +1,45 @@
+{
+    "os": "Windows-11-10.0.22631-SP0",
+    "python": "3.12.3",
+    "heartbeatAt": "2024-06-11T20:36:31.466224",
+    "startedAt": "2024-06-11T20:36:29.344338",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "c:\\Users\\Tomas\\Desktop\\EPFL\\Master Robotique\\MA4\\NLP\\project-m3-2024-nlpsuricates\\training_mcqa.py",
+    "codePathLocal": "training_mcqa.py",
+    "codePath": "training_mcqa.py",
+    "git": {
+        "remote": "https://github.com/CS-552/project-m3-2024-nlpsuricates.git",
+        "commit": "dc4578e0616b8e98ce3ca950f7e4156d6adc0de9"
+    },
+    "email": "95030283+TomasVDDC@users.noreply.github.com",
+    "root": "C:/Users/Tomas/Desktop/EPFL/Master Robotique/MA4/NLP/project-m3-2024-nlpsuricates",
+    "host": "LAPTOP-4BKVO0V5",
+    "username": "Tomas",
+    "executable": "c:\\Users\\Tomas\\Desktop\\EPFL\\Master Robotique\\MA4\\NLP\\project-m2-2024-nlpsuricates\\nlp_m2\\Scripts\\python.exe",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 800.0,
+        "min": 0.0,
+        "max": 1800.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 800.0,
+            "min": 0.0,
+            "max": 1800.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 237.05273056030273,
+            "used": 228.3634376525879
+        }
+    },
+    "memory": {
+        "total": 7.7538604736328125
+    }
+}
