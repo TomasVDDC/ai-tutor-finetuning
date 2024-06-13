@@ -4,7 +4,8 @@ from peft import LoraConfig, get_peft_model
 import pandas as pd
 from datasets import load_dataset, Dataset, DatasetDict
 from transformers import TrainingArguments
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer
+import torch
 
 # Load the dataset
 DATASET_PATH_EVAL = "./data/MMLU_mcq_clean_test.jsonl"
@@ -46,6 +47,26 @@ model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH, trust_remote_code=True
 )
 
+# Define a custom loss function
+def custom_loss(outputs, labels):
+    logits = outputs.logits
+    loss = torch.nn.functional.mse_loss(logits, labels)
+    return loss
+
+# Custom Trainer to output the loss
+class CustomTrainer(SFTTrainer):
+    def __init__(self, *args, **kwargs):
+        super(CustomTrainer, self).__init__(*args, **kwargs)
+
+    def compute_loss(self, model, inputs, return_outputs=False):
+        print("inputs", inputs)
+        labels = inputs.get("labels")
+        outputs = model(**inputs)
+        loss = custom_loss(outputs, labels)
+        if return_outputs:
+            return loss, outputs
+        return loss
+
 lora_config = LoraConfig(
     r=16,
     lora_alpha=32,
@@ -60,25 +81,27 @@ lora_config = LoraConfig(
     ],  # Adjust based on your model's architecture
 )
 
-model = get_peft_model(model, lora_config)
+print(model)
 
-trainer = SFTTrainer(
-    model=model,
-    args=training_args,
-    train_dataset=dataset_train,
-    eval_dataset=dataset_eval,
-    tokenizer=tokenizer,
-)
+# model = get_peft_model(model, lora_config)
 
-trainer.train()
+# trainer = CustomTrainer(
+#     model=model,
+#     args=training_args,
+#     train_dataset=dataset_train,
+#     eval_dataset=dataset_eval,
+#     tokenizer=tokenizer,
+# )
 
-print("Training finished")
+# trainer.train()
 
-save_directory = "./checkpoints/mcqa_sft_training/"
+# print("Training finished")
 
-model.save_pretrained(save_directory)
-tokenizer.save_pretrained(save_directory)
+# save_directory = "./checkpoints/mcqa_custom_loss_training/"
 
-print("Saving finished")
+# model.save_pretrained(save_directory)
+# tokenizer.save_pretrained(save_directory)
+
+# print("Saving finished")
 
 

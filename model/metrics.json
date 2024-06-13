@@ -1,5 +1,5 @@
 {
   "team_name": "nlpsuricates",
   "task_type": "causal_lm",
-  "policy_acc": 0.0
+  "policy_acc": 0.22
 }
