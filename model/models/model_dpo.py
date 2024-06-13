@@ -46,8 +46,7 @@ class AutoDPOModelForCausalLM(PreTrainedModelWrapper):
         super().__init__(pretrained_model, **kwargs)
 
         if not any(
-            hasattr(self.pretrained_model, attribute)
-            for attribute in self.lm_head_namings
+            hasattr(self.pretrained_model, attribute) for attribute in self.lm_head_namings
         ):
             raise ValueError(
                 "The model does not have a language model head, please use a model that has one."
@@ -392,43 +391,52 @@ class AutoDPOModelForCausalLM(PreTrainedModelWrapper):
         Returns:
             output_dict (`dict`): A dictionary containing the model predictions given input questions.
         """
+        print("batch", batch)
         output_dict = {"preds": []}
-
-        ########################################################################
-        # TODO: Please implement the prediction step that generates the prediction of the given MCQA question
-        # ======================================================================
-        # You need to return one letter prediction for each question.
-        # ======================================================================
-     
-        ########################################################################
         
+
+        # {29909: 'A', 29933: 'B', 29907: 'C', 29928: 'D'}
         def convert_to_letter(prediction_class):
-            if prediction_class == 0:
+            if prediction_class == 29909:
                 return "A"
-            elif prediction_class == 1:
+            elif prediction_class == 29933:
                 return "B"
-            elif prediction_class == 2:
+            elif prediction_class == 29907:
                 return "C"
-            elif prediction_class == 3:
+            elif prediction_class == 29928:
                 return "D"
-        def convert_to_class(prediction_letter):
-            if prediction_letter == "A":
-                return 0
-            elif prediction_letter == "B":
-                return 1
-            elif prediction_letter == "C":
-                return 2
-            elif prediction_letter == "D":
-                return 3
+            else:
+                return "Z"
             
-        inputs = tokenizer(batch["question"], return_tensors="pt", padding=True, truncation=True)
+        # def convert_to_class(prediction_letter):
+        #     if prediction_letter == "A":
+        #         return 0
+        #     elif prediction_letter == "B":
+        #         return 1
+        #     elif prediction_letter == "C":
+        #         return 2
+        #     elif prediction_letter == "D":
+        #         return 3
+            
+        inputs = tokenizer(batch["question"], return_tensors="pt", padding="max_length", truncation=True , max_length=512)
+
         with torch.no_grad():
-            labels = list(map(convert_to_class, batch["answer"]))   # A->0
-            outputs = self.pretrained_model(**inputs,labels=labels)
+            labels = batch["answer"]   # A->0
+            outputs = self.pretrained_model(**inputs)
+            print("labels: ", labels)
+             
             logits = outputs.logits
-            prediction_classes = logits.argmax(dim=-1)
+
+            print("logits shape: ", logits.shape)
+
+            prediction_classes = logits[:,-1,:].argmax(dim=-1)
             prediction_letters = list(map(convert_to_letter, prediction_classes)) # 0->A
+
+            print("prediction_letters: ", prediction_letters)
+
             output_dict["preds"].extend(prediction_letters)
+
+        print("Prediction_step_mcqa", output_dict)
 
         return output_dict
 
