@@ -184,7 +184,7 @@ class DPOModelEvaluator:
         )
         chosen_rewards = output_dict["chosen_rewards"]
         rejected_rewards = output_dict["rejected_rewards"]
-        
+
         return chosen_rewards, rejected_rewards
 
     def compute_reference_logprobs(self, test_data: List[Dict]):
@@ -445,11 +445,11 @@ if __name__ == "__main__":
         print("Computing reference logprobs...")
         # Compute the log probabilities of the reference model for the test data
         new_test_data = evaluator.compute_reference_logprobs(test_data)
-        print("logprobs",new_test_data)
+        print("logprobs", new_test_data)
         test_dataloader = DataLoader(new_test_data, batch_size=8)
         # compute the reward accuracy
         policy_reward_acc = evaluator.scoring_reward_computation(test_dataloader)
-        print("policy_reward_acc",policy_reward_acc)
+        print("policy_reward_acc", policy_reward_acc)
 
         metrics["policy_reward_accuracy"] = policy_reward_acc
 
