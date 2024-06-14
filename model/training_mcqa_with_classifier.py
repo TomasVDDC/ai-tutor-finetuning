@@ -25,6 +25,8 @@ dataset_train = createDataset(DATASET_PATH_TRAIN)
 dataset_eval = createDataset(DATASET_PATH_EVAL)
 print("dataset_train", dataset_train)
 
+
+
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf")
 tokenizer.pad_token_id = tokenizer.eos_token_id
 tokenizer.pad_token = tokenizer.eos_token
@@ -44,9 +46,9 @@ training_args = TrainingArguments(
     report_to="all",
 )
 
-config = AutoConfig.from_pretrained("./mcq_hf_model", trust_remote_code=True)
-model = AutoModel.from_pretrained(
-    "./mcq_hf_model", config=config, trust_remote_code=True
+config = AutoConfig.from_pretrained("./checkpoints/mcq_hf_model", trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained(
+    "./checkpoints/mcq_hf_model", config=config, trust_remote_code=True
 )
 
 lora_config = LoraConfig(

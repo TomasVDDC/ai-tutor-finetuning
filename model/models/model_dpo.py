@@ -393,66 +393,71 @@ class AutoDPOModelForCausalLM(PreTrainedModelWrapper):
         """
         output_dict = {"preds": []}
 
-        # {29909: 'A', 29933: 'B', 29907: 'C', 29928: 'D'}
         def convert_to_letter(prediction_class):
-            if prediction_class == 29909:
+            if prediction_class == 0:
                 return "A"
-            elif prediction_class == 29933:
+            elif prediction_class == 1:
                 return "B"
-            elif prediction_class == 29907:
+            elif prediction_class == 2:
                 return "C"
-            elif prediction_class == 29928:
+            elif prediction_class == 3:
                 return "D"
-            else:
-                return prediction_class
-            
-
+ 
         tokenizer.pad_token_id = tokenizer.eos_token_id
         tokenizer.pad_token = tokenizer.eos_token
         inputs = tokenizer(batch["question"], return_tensors="pt", padding="max_length", truncation=True , max_length=512)
 
-        # print("Attention mask: ", inputs.attention_mask[0])
+        outputs = self.pretrained_model(**inputs) # [batch, prediction_class]
+        print("logits", outputs.logits.shape)
+        prediction_classes_for_all_logits = outputs.logits.argmax(dim=-1)
+        print("predictions",prediction_classes_for_all_logits)
 
-        with torch.no_grad():
-            outputs = self.pretrained_model(**inputs)
-            logits = outputs.logits
+        prediction_letters = list(map(convert_to_letter, prediction_classes_for_all_logits))
+        print("prediction_letters", prediction_letters)
+        output_dict["preds"].extend(prediction_letters)
 
-            # print("logits shape: ", logits.shape)
+        # # print("Attention mask: ", inputs.attention_mask[0])
 
-            tokens_to_inspect = [29909, 29933, 29907, 29928]
+        # with torch.no_grad():
+        #    
+        #     logits = outputs.logits
 
-            prediction_classes_for_all_logits = logits[:,:,:].argmax(dim=-1)
-            # print("prediction_classes_for_all_logits: ", prediction_classes_for_all_logits)
-            # print("prediction_classes_for_all_logits shape: ", prediction_classes_for_all_logits.shape)
+        #     # print("logits shape: ", logits.shape)
 
-            # Initialize a dictionary to hold counts for each row
-            row_token_counts = []
+        #     tokens_to_inspect = [29909, 29933, 29907, 29928]
 
-            # Iterate over each row in the tensor
-            for row in prediction_classes_for_all_logits:
-                token_counts = {token: 0 for token in tokens_to_inspect}
-                for token_id in row:
-                    if token_id.item() in token_counts:
-                        token_counts[token_id.item()] += 1
+        #     prediction_classes_for_all_logits = logits[:,:,:].argmax(dim=-1)
+        #     # print("prediction_classes_for_all_logits: ", prediction_classes_for_all_logits)
+        #     # print("prediction_classes_for_all_logits shape: ", prediction_classes_for_all_logits.shape)
+
+        #     # Initialize a dictionary to hold counts for each row
+        #     row_token_counts = []
+
+        #     # Iterate over each row in the tensor
+        #     for row in prediction_classes_for_all_logits:
+        #         token_counts = {token: 0 for token in tokens_to_inspect}
+        #         for token_id in row:
+        #             if token_id.item() in token_counts:
+        #                 token_counts[token_id.item()] += 1
                 
-                row_token_counts.append(token_counts)
+        #         row_token_counts.append(token_counts)
 
-            # print(row_token_counts)
-            highest_tokens = []
+        #     # print(row_token_counts)
+        #     highest_tokens = []
 
-            for token_counts in row_token_counts:
-                highest_token = max(token_counts, key=token_counts.get)
-                highest_tokens.append(highest_token)
+        #     for token_counts in row_token_counts:
+        #         highest_token = max(token_counts, key=token_counts.get)
+        #         highest_tokens.append(highest_token)
 
-            # print(highest_tokens)            
+        #     # print(highest_tokens)            
             
-            # logits_first_prompt = logits[2,:,:].argmax(dim=-1)
-            # print("logits first prompt ", logits_first_prompt)
-            prediction_letters = list(map(convert_to_letter, highest_tokens)) # 0->A
+        #     # logits_first_prompt = logits[2,:,:].argmax(dim=-1)
+        #     # print("logits first prompt ", logits_first_prompt)
+        #     prediction_letters = list(map(convert_to_letter, highest_tokens)) # 0->A
 
-            output_dict["preds"].extend(prediction_letters)
+        #     output_dict["preds"].extend(prediction_letters)
 
-        # print("Prediction_step_mcqa", output_dict)
+        # # print("Prediction_step_mcqa", output_dict)
 
         return output_dict
 
@@ -754,3 +759,66 @@ class AutoDPOModelForSeq2SeqLM(PreTrainedModelWrapper):
         ########################################################################
 
         return output_dict
+
+
+
+ # # {29909: 'A', 29933: 'B', 29907: 'C', 29928: 'D'}
+        # def convert_to_letter(prediction_class):
+        #     if prediction_class == 29909:
+        #         return "A"
+        #     elif prediction_class == 29933:
+        #         return "B"
+        #     elif prediction_class == 29907:
+        #         return "C"
+        #     elif prediction_class == 29928:
+        #         return "D"
+        #     else:
+        #         return prediction_class
+            
+
+        # tokenizer.pad_token_id = tokenizer.eos_token_id
+        # tokenizer.pad_token = tokenizer.eos_token
+        # inputs = tokenizer(batch["question"], return_tensors="pt", padding="max_length", truncation=True , max_length=512)
+
+        # # print("Attention mask: ", inputs.attention_mask[0])
+
+        # with torch.no_grad():
+        #     outputs = self.pretrained_model(**inputs)
+        #     logits = outputs.logits
+
+        #     # print("logits shape: ", logits.shape)
+
+        #     tokens_to_inspect = [29909, 29933, 29907, 29928]
+
+        #     prediction_classes_for_all_logits = logits[:,:,:].argmax(dim=-1)
+        #     # print("prediction_classes_for_all_logits: ", prediction_classes_for_all_logits)
+        #     # print("prediction_classes_for_all_logits shape: ", prediction_classes_for_all_logits.shape)
+
+        #     # Initialize a dictionary to hold counts for each row
+        #     row_token_counts = []
+
+        #     # Iterate over each row in the tensor
+        #     for row in prediction_classes_for_all_logits:
+        #         token_counts = {token: 0 for token in tokens_to_inspect}
+        #         for token_id in row:
+        #             if token_id.item() in token_counts:
+        #                 token_counts[token_id.item()] += 1
+                
+        #         row_token_counts.append(token_counts)
+
+        #     # print(row_token_counts)
+        #     highest_tokens = []
+
+        #     for token_counts in row_token_counts:
+        #         highest_token = max(token_counts, key=token_counts.get)
+        #         highest_tokens.append(highest_token)
+
+        #     # print(highest_tokens)            
+            
+        #     # logits_first_prompt = logits[2,:,:].argmax(dim=-1)
+        #     # print("logits first prompt ", logits_first_prompt)
+        #     prediction_letters = list(map(convert_to_letter, highest_tokens)) # 0->A
+
+        #     output_dict["preds"].extend(prediction_letters)
+
+        # # print("Prediction_step_mcqa", output_dict)

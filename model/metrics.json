@@ -1,5 +1,8 @@
 {
   "team_name": "nlpsuricates",
   "task_type": "causal_lm",
-  "policy_acc": 0.22
+  "policy_acc": 0.0,
+  "orig_model_size": 24985072,
+  "quantized_model_size": 0,
+  "quantized_policy_acc": 0.0
 }

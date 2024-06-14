@@ -22,11 +22,11 @@ def createDataset(dataset_path):
     return dataset
 
 
-config = AutoConfig.from_pretrained(
-    "./checkpoints/mcq_hf_model", trust_remote_code=True
-)
+# config = AutoConfig.from_pretrained(
+#     "./checkpoints/mcqa_model_trained", trust_remote_code=True
+# )
 model = AutoModelForCausalLM.from_pretrained(
-    "./checkpoints/mcq_hf_model", config=config, trust_remote_code=True
+    "./checkpoints/mcqa_model_trained", trust_remote_code=True
 )
 
 DATASET_PATH_EVAL = "./data/MMLU_mcq_clean_test.jsonl"
@@ -41,7 +41,7 @@ tokenizer.pad_token = tokenizer.eos_token
 tokenizer.model_max_length = 512
 
 
-print(model)
+#print(model)
 
 print("===================")
 print(dataset_train[0:2]["prompt"])
