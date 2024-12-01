@@ -16,11 +16,11 @@ This repository contains our implementation of an AI Tutor for EPFL course conte
 ** MCQ Fine-Tuning Implementation
    - We experimented with two approaches to implement Multiple Choice Question (MCQ) handling, each with unique challenges:
      
-     **Supervised Fine-Tuning (SFT) using MCQ Data**  
+     *Supervised Fine-Tuning (SFT) using MCQ Data*
         - *Method:* We fine-tuned the pre-trained model using MCQ data and optimized it with HuggingFace's TRL library. The model was trained on supervised learning tasks with smaller datasets.
         - *Post-Processing:* After training, we experimented with two post-processing strategies to extract a single-letter answer from the finetuned model.
 
-     **Classifier Head Added on Top of OpenELM Model and Trained Using LoRa**  
+     *Classifier Head Added on Top of OpenELM Model and Trained Using LoRa*
         - *Method:* We added a linear classifier head on top of the OpenELM model. This linear layer mapped the model’s output (1538-dimensional) to four distinct classes representing the output letters of the MCQs.
         - *LoRa Configuration:* To minimize training time, we used LoRa for efficient training. Here’s the configuration used for LoRa:
 
