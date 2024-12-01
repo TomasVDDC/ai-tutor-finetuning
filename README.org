@@ -8,7 +8,9 @@ This repository contains our implementation of an AI Tutor for EPFL course conte
 
 ** Training a Generator Model with DPO
    - *Framework:* We used PyTorch and Hugging Face's ~transformers~ library for model training.
+
    - *Base Model:* In April 2024 Apple released OpenELM (Mehta et al., 2024a), a family of Open Efficient Language Models. OpenELM uses a decoder-only transformer architecture, similar to other LLMs like GPT-3. We decided to use the OpenELM-450MInstruct model over it’s larger conterparts to minimize training time.
+
    - *Implementation:* We implemented the DPO in two sections the evaluation and the training. To do the training we used the DPOTrainer from huggingface and the data described in the Dataset section. As for the evaluation we implemented the reward function with entailed calculating the log prob as show in the DPO paper (Rafailov et al., 2023).
 
 ** MCQ Fine-Tuning Implementation
