@@ -1,0 +1,32 @@
+* Overview
+This repository contains our implementation of an AI Tutor for EPFL course content. The AI tutor was developed using modern techniques for fine-tuning language models, including preference data collection, Direct Preference Optimization (DPO) and Quantization.
+
+* Project Structure
+** Collecting Preference Data
+   - *Method:* Students used ChatGPT to generate two answers to questions from EPFL courses, ranking them by correctness,relevance, and clarity. From 1,522 unique questions, we collected 26,641 responses pairs.
+   - *Storage:* Data is stored in JSONL format in the =model/data/= directory.
+
+** Training a Generator Model with DPO
+   - *Framework:* We used PyTorch and Hugging Face's ~transformers~ library for model training.
+   - *Base Model:* In April 2024 Apple released OpenELM (Mehta et al., 2024a), a family of Open Efficient Language
+Models. OpenELM uses a decoder-only transformer architecture, similar to other LLMs like GPT-3. We decided to use the OpenELM-450MInstruct model over it’s larger conterparts to minimize training time.
+   - *Implementation:* We implemented the DPO in two sections the evaluation and the training. To do the training we used the DPOTrainer from huggingface and the data described in the Dataset section. As for the evaluation we implemented the reward function with entailed calculating the log prob as show in the DPO paper (Rafailov et al., 2023).
+
+** MCQ Fine-Tuning Implementation
+   - We experimented with two approaches to implement Multiple Choice Question (MCQ) handling, each with unique challenges:
+     
+     1. **Supervised Fine-Tuning (SFT) using MCQ Data**  
+        - *Method:* We fine-tuned the pre-trained model using MCQ data and optimized it with HuggingFace's TRL library. The model was trained on supervised learning tasks with smaller datasets.
+        - *Post-Processing:* After training, we experimented with two post-processing strategies to extract a single-letter answer from the finetuned model.
+
+     2. **Classifier Head Added on Top of OpenELM Model and Trained Using LoRa**  
+        - *Method:* We added a linear classifier head on top of the OpenELM model. This linear layer mapped the model’s output (1538-dimensional) to four distinct classes representing the output letters of the MCQs.
+        - *LoRa Configuration:* To minimize training time, we used LoRa for efficient training. Here’s the configuration used for LoRa:
+
+** Quantization
+   - *Method:* We experimented with quantizing the weights of our model to reduce computational requirements for inference. 
+   - *Challenge:* Libraries like "Quanto" from Hugging Face were not compatible with our model’s specific architecture.
+   - *Alternative Approach:* Instead of weight quantization, we chose to downsample the model, which led to slightly worse results but significantly reduced the model size. By using bf16 (bfloat16), we were able to cut the model's size by half while maintaining similar precision. This enabled more efficient deployment without compromising performance significantly.
+
+* Results
+Our experimental results demonstrated significant improvements in model performance, achieving an accuracy of 0.36% in selecting the correct multiple-choice answer, compared to the baseline accuracy of 0.25%.
